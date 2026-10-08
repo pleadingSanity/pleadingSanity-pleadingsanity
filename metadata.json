@@ -1,0 +1,6 @@
+{
+  "name": "Pleading Sanity — Rise From Madness",
+  "description": "Official platform for Pleading Sanity (pleadingsanity.co.uk). A mental health revolution disguised as a streetwear brand, cosmic healing hub, Healing Hz sound therapy, Cosmic Connect interactive calmness, and community resilience.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
