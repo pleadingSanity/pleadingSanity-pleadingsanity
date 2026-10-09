@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Sparkles, 
   RotateCcw, 
@@ -8,20 +8,68 @@ import {
   Eye, 
   Check, 
   CheckCircle2, 
-  Star,
-  Flame,
+  Trash2,
+  Send,
+  Zap,
   Volume2
 } from 'lucide-react';
 import { CONSTELLATIONS } from '../data/mockData';
 import { Constellation, MemoryCard } from '../types';
 import { audioEngine } from '../utils/audioEngine';
 
+// Extended Constellation Catalog (5 Master Constellations)
+const EXTENDED_CONSTELLATIONS: Constellation[] = [
+  ...CONSTELLATIONS,
+  {
+    id: 'c-heart',
+    title: 'The Unbroken Heart',
+    symbol: '💛',
+    meaning: 'Healing grows where you thought you were completely broken. Fractured stone wrapped in wildflower stars.',
+    affirmation: 'My heart has broken open, not broken down. Life and compassion pour through the cracks.',
+    nodes: [
+      { id: 1, x: 200, y: 150, name: 'Inner Cleft' },
+      { id: 2, x: 130, y: 90, name: 'Left Atrium' },
+      { id: 3, x: 70, y: 160, name: 'Left Arch' },
+      { id: 4, x: 130, y: 250, name: 'Left Ventricle' },
+      { id: 5, x: 200, y: 320, name: 'Apex of Renewal' },
+      { id: 6, x: 270, y: 250, name: 'Right Ventricle' },
+      { id: 7, x: 330, y: 160, name: 'Right Arch' },
+      { id: 8, x: 270, y: 90, name: 'Right Atrium' }
+    ],
+    connections: [
+      [1, 2], [2, 3], [3, 4], [4, 5],
+      [1, 8], [8, 7], [7, 6], [6, 5]
+    ]
+  },
+  {
+    id: 'c-crown',
+    title: 'The Crown of Serenity',
+    symbol: '👑',
+    meaning: 'Sanity earns you status — not clout. Quiet sovereignty over your inner universe.',
+    affirmation: 'I crown myself with patience. I do not have to perform for a world that does not understand my silence.',
+    nodes: [
+      { id: 1, x: 100, y: 260, name: 'Left Base' },
+      { id: 2, x: 200, y: 270, name: 'Center Base' },
+      { id: 3, x: 300, y: 260, name: 'Right Base' },
+      { id: 4, x: 80, y: 150, name: 'Left Spire' },
+      { id: 5, x: 150, y: 190, name: 'Valley L' },
+      { id: 6, x: 200, y: 90, name: 'Solar Apex' },
+      { id: 7, x: 250, y: 190, name: 'Valley R' },
+      { id: 8, x: 320, y: 150, name: 'Right Spire' }
+    ],
+    connections: [
+      [1, 2], [2, 3],
+      [1, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 3]
+    ]
+  }
+];
+
 export const CosmicConnect: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'constellation' | 'breathe' | 'memory' | 'grounding'>('constellation');
+  const [activeTab, setActiveTab] = useState<'constellation' | 'breathe' | 'memory' | 'dissolver' | 'grounding'>('constellation');
 
   // --- Constellation Drawing State ---
   const [activeConstellationIndex, setActiveConstellationIndex] = useState(0);
-  const currentConstellation = CONSTELLATIONS[activeConstellationIndex];
+  const currentConstellation = EXTENDED_CONSTELLATIONS[activeConstellationIndex];
   const [connectedNodes, setConnectedNodes] = useState<number[]>([]);
   const [constellationCompleted, setConstellationCompleted] = useState(false);
 
@@ -31,9 +79,8 @@ export const CosmicConnect: React.FC = () => {
     if (!connectedNodes.includes(nodeId)) {
       const next = [...connectedNodes, nodeId];
       setConnectedNodes(next);
-      audioEngine.playChime(300 + nodeId * 60);
+      audioEngine.playChime(300 + nodeId * 45);
 
-      // Check if all nodes touched
       if (next.length === currentConstellation.nodes.length) {
         setConstellationCompleted(true);
         audioEngine.playChime(528);
@@ -47,33 +94,22 @@ export const CosmicConnect: React.FC = () => {
   };
 
   const handleNextConstellation = () => {
-    setActiveConstellationIndex((prev) => (prev + 1) % CONSTELLATIONS.length);
+    setActiveConstellationIndex((prev) => (prev + 1) % EXTENDED_CONSTELLATIONS.length);
     setConnectedNodes([]);
     setConstellationCompleted(false);
   };
 
   // --- Star Breathe State ---
-  const [breathePattern, setBreathePattern] = useState<'478' | 'box'>('478');
+  const [breathePattern, setBreathePattern] = useState<'478' | 'box' | '48'>('478');
   const [breathPhase, setBreathPhase] = useState<'Inhale' | 'Hold' | 'Exhale' | 'Pause'>('Inhale');
   const [breathTimer, setBreathTimer] = useState(4);
   const [completedCycles, setCompletedCycles] = useState(0);
-  const [isBreatheActive, setIsBreatheActive] = useState(true);
 
   useEffect(() => {
-    if (!isBreatheActive) return;
-
-    let timerId: number;
-    // Phases timings
-    // 4-7-8: Inhale 4, Hold 7, Exhale 8
-    // Box: Inhale 4, Hold 4, Exhale 4, Pause 4
-
     const tick = () => {
       setBreathTimer((prev) => {
-        if (prev > 1) {
-          return prev - 1;
-        }
+        if (prev > 1) return prev - 1;
 
-        // Phase transitions
         if (breathePattern === '478') {
           if (breathPhase === 'Inhale') {
             setBreathPhase('Hold');
@@ -89,8 +125,7 @@ export const CosmicConnect: React.FC = () => {
             setCompletedCycles((c) => c + 1);
             return 4;
           }
-        } else {
-          // Box Breathing
+        } else if (breathePattern === 'box') {
           if (breathPhase === 'Inhale') {
             setBreathPhase('Hold');
             audioEngine.playChime(432);
@@ -109,82 +144,90 @@ export const CosmicConnect: React.FC = () => {
             setCompletedCycles((c) => c + 1);
             return 4;
           }
+        } else {
+          // 4-8 Vagal Release
+          if (breathPhase === 'Inhale') {
+            setBreathPhase('Exhale');
+            audioEngine.playChime(396);
+            return 8;
+          } else {
+            setBreathPhase('Inhale');
+            audioEngine.playChime(528);
+            setCompletedCycles((c) => c + 1);
+            return 4;
+          }
         }
       });
     };
 
-    timerId = window.setInterval(tick, 1000);
+    const timerId = window.setInterval(tick, 1000);
     return () => clearInterval(timerId);
-  }, [isBreatheActive, breathPhase, breathePattern]);
+  }, [breathPhase, breathePattern]);
 
-  // --- Cosmic Memory Game State ---
+  // --- 16-Card Cosmic Memory Game ---
   const initialSymbols = [
-    { symbolId: 'sigil', name: 'Celestial Sigil', icon: '✦', color: '#818CF8' },
-    { symbolId: 'wave', name: 'Solfeggio Wave', icon: '〰', color: '#38BDF8' },
+    { symbolId: 'sigil', name: 'Sanity Sigil', icon: '✦', color: '#818CF8' },
+    { symbolId: 'wave', name: 'Solfeggio 528', icon: '〰', color: '#38BDF8' },
     { symbolId: 'phoenix', name: 'Phoenix Fire', icon: '❖', color: '#F43F5E' },
-    { symbolId: 'anchor', name: 'Sanity Anchor', icon: '⚓', color: '#34D399' },
+    { symbolId: 'anchor', name: 'Ocean Anchor', icon: '⚓', color: '#34D399' },
     { symbolId: 'moon', name: 'Crescent Peace', icon: '☽', color: '#A78BFA' },
-    { symbolId: 'lotus', name: 'Rebirth Lotus', icon: '❀', color: '#FBBF24' }
+    { symbolId: 'lotus', name: 'Wild Rebirth', icon: '❀', color: '#FBBF24' },
+    { symbolId: 'star', name: 'Guiding Compass', icon: '★', color: '#60A5FA' },
+    { symbolId: 'heart', name: 'Unbroken Soul', icon: '♥', color: '#FB7185' }
   ];
 
-  const createShuffledDeck = (): MemoryCard[] => {
+  const createDeck = (): MemoryCard[] => {
     const deck: MemoryCard[] = [];
-    let idCounter = 1;
-
-    [...initialSymbols, ...initialSymbols].forEach((item) => {
+    let counter = 1;
+    [...initialSymbols, ...initialSymbols].forEach((s) => {
       deck.push({
-        id: idCounter++,
-        symbolId: item.symbolId,
-        name: item.name,
-        icon: item.icon,
-        color: item.color,
+        id: counter++,
+        symbolId: s.symbolId,
+        name: s.name,
+        icon: s.icon,
+        color: s.color,
         isFlipped: false,
         isMatched: false
       });
     });
-
     return deck.sort(() => Math.random() - 0.5);
   };
 
-  const [memoryCards, setMemoryCards] = useState<MemoryCard[]>(createShuffledDeck());
+  const [memoryCards, setMemoryCards] = useState<MemoryCard[]>(createDeck());
   const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [matchesCount, setMatchesCount] = useState(0);
 
   const handleCardClick = (index: number) => {
-    if (flippedIndices.length === 2 || memoryCards[index].isFlipped || memoryCards[index].isMatched) {
-      return;
-    }
+    if (flippedIndices.length === 2 || memoryCards[index].isFlipped || memoryCards[index].isMatched) return;
 
-    const newCards = [...memoryCards];
-    newCards[index].isFlipped = true;
-    setMemoryCards(newCards);
+    const next = [...memoryCards];
+    next[index].isFlipped = true;
+    setMemoryCards(next);
 
     const newFlipped = [...flippedIndices, index];
     setFlippedIndices(newFlipped);
-    audioEngine.playChime(350 + index * 25);
+    audioEngine.playChime(320 + index * 20);
 
     if (newFlipped.length === 2) {
       setMoves((m) => m + 1);
-      const [firstIdx, secondIdx] = newFlipped;
-      if (newCards[firstIdx].symbolId === newCards[secondIdx].symbolId) {
-        // Matched!
+      const [first, second] = newFlipped;
+      if (next[first].symbolId === next[second].symbolId) {
         setTimeout(() => {
-          const matchedCards = [...newCards];
-          matchedCards[firstIdx].isMatched = true;
-          matchedCards[secondIdx].isMatched = true;
-          setMemoryCards(matchedCards);
+          const matched = [...next];
+          matched[first].isMatched = true;
+          matched[second].isMatched = true;
+          setMemoryCards(matched);
           setFlippedIndices([]);
           setMatchesCount((c) => c + 1);
-          audioEngine.playChime(528);
-        }, 500);
+          audioEngine.playChime(639);
+        }, 400);
       } else {
-        // Not matched, flip back
         setTimeout(() => {
-          const resetCards = [...newCards];
-          resetCards[firstIdx].isFlipped = false;
-          resetCards[secondIdx].isFlipped = false;
-          setMemoryCards(resetCards);
+          const reset = [...next];
+          reset[first].isFlipped = false;
+          reset[second].isFlipped = false;
+          setMemoryCards(reset);
           setFlippedIndices([]);
         }, 900);
       }
@@ -192,13 +235,51 @@ export const CosmicConnect: React.FC = () => {
   };
 
   const handleResetMemory = () => {
-    setMemoryCards(createShuffledDeck());
+    setMemoryCards(createDeck());
     setFlippedIndices([]);
     setMoves(0);
     setMatchesCount(0);
   };
 
-  // --- 5-4-3-2-1 Sensory Grounding State ---
+  // --- The Void Jar (Thought Dissolver) ---
+  const [voidThought, setVoidThought] = useState('');
+  const [isDissolving, setIsDissolving] = useState(false);
+  const [dissolvedParticles, setDissolvedParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
+  const [affirmationResult, setAffirmationResult] = useState<string | null>(null);
+
+  const handleDissolveThought = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!voidThought.trim()) return;
+
+    setIsDissolving(true);
+    audioEngine.playChime(174);
+
+    const particles = [];
+    for (let i = 0; i < 40; i++) {
+      particles.push({
+        id: i,
+        x: (Math.random() - 0.5) * 300,
+        y: -Math.random() * 250 - 50
+      });
+    }
+    setDissolvedParticles(particles);
+
+    setTimeout(() => {
+      audioEngine.playChime(528);
+      setIsDissolving(false);
+      setVoidThought('');
+      setDissolvedParticles([]);
+      const affirmations = [
+        'That thought has dissipated into the cosmic ether. You are not your intrusive thoughts.',
+        'The static has cleared. You remain steady, grounded, and unshakeable.',
+        'Pain transmuted into stardust. Take a deep, slow breath.',
+        'You have surrendered the burden. Carry only your light forward.'
+      ];
+      setAffirmationResult(affirmations[Math.floor(Math.random() * affirmations.length)]);
+    }, 1800);
+  };
+
+  // --- 5-4-3-2-1 Grounding State ---
   const [groundingChecks, setGroundingChecks] = useState<Record<string, boolean>>({});
   const toggleGroundingCheck = (key: string) => {
     setGroundingChecks((prev) => {
@@ -214,7 +295,7 @@ export const CosmicConnect: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
           <div className="flex items-center gap-2 text-xs font-mono text-indigo-400 mb-1">
-            <span>HUMAN SANITY HUB · INTERACTIVE CALMNESS</span>
+            <span>HUMAN SANITY HUB · MINDFULNESS SUITE</span>
             <span aria-hidden="true">·</span>
             <span>COSMIC CONNECT</span>
           </div>
@@ -222,17 +303,19 @@ export const CosmicConnect: React.FC = () => {
             Cosmic Connect
           </h1>
           <p className="mt-1 text-sm text-slate-300 max-w-2xl">
-            Gentle interactive mindfulness tools designed to quiet racing thoughts, activate the parasympathetic nervous system, and return your awareness safely to the physical present.
+            Interactive nervous-system de-escalation games and sacred mindfulness tools. 
+            Connect stars, regulate respiration, dissolve heavy thoughts into stardust, and sharpen mental clarity.
           </p>
         </div>
 
         {/* Mode Selector Tabs */}
         <div className="flex items-center gap-1 p-1 bg-slate-900 rounded-lg border border-slate-800 self-start md:self-auto overflow-x-auto">
           {[
-            { id: 'constellation', label: 'Draw Constellation', icon: Sparkles },
+            { id: 'constellation', label: 'Star Drawing', icon: Sparkles },
             { id: 'breathe', label: 'Star Breathe', icon: Wind },
             { id: 'memory', label: 'Cosmic Memory', icon: Brain },
-            { id: 'grounding', label: '5-4-3-2-1 Grounding', icon: Eye }
+            { id: 'dissolver', label: 'Thought Dissolver', icon: Zap },
+            { id: 'grounding', label: '5-4-3-2-1 Guide', icon: Eye }
           ].map((item) => (
             <button
               key={item.id}
@@ -254,16 +337,13 @@ export const CosmicConnect: React.FC = () => {
       {activeTab === 'constellation' && (
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
           <div className="lg:col-span-2 rounded-2xl border border-indigo-900/40 bg-[#090c17] p-6 shadow-2xl relative overflow-hidden">
-            {/* Ambient Nebula back-glow */}
-            <div className="absolute inset-0 bg-radial from-indigo-900/10 via-transparent to-transparent pointer-events-none" />
-
             <div className="flex items-center justify-between text-xs text-slate-400 mb-4 border-b border-slate-800/80 pb-3">
               <div>
-                <span className="font-mono text-indigo-400 uppercase">
+                <span className="font-mono text-indigo-400 uppercase font-bold">
                   {currentConstellation.title}
                 </span>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  Click the pulsing stars to trace the sacred celestial lines
+                  Click the pulsing stars to trace the sacred geometry lines
                 </p>
               </div>
 
@@ -279,15 +359,15 @@ export const CosmicConnect: React.FC = () => {
                   onClick={handleNextConstellation}
                   className="rounded bg-indigo-600/30 border border-indigo-500/40 px-2.5 py-1 text-xs text-indigo-300 hover:bg-indigo-600/50"
                 >
-                  Next Star Form
+                  Next ({activeConstellationIndex + 1}/{EXTENDED_CONSTELLATIONS.length})
                 </button>
               </div>
             </div>
 
             {/* Interactive Star Canvas SVG */}
-            <div className="relative mx-auto w-full max-w-[420px] aspect-square rounded-xl bg-black/60 border border-slate-800 flex items-center justify-center">
+            <div className="relative mx-auto w-full max-w-[420px] aspect-square rounded-xl bg-black/70 border border-slate-800 flex items-center justify-center overflow-hidden">
               <svg viewBox="0 0 400 400" className="h-full w-full">
-                {/* Drawn Connections */}
+                {/* Lines */}
                 {currentConstellation.connections.map(([fromId, toId], idx) => {
                   const fromNode = currentConstellation.nodes.find((n) => n.id === fromId);
                   const toNode = currentConstellation.nodes.find((n) => n.id === toId);
@@ -305,23 +385,21 @@ export const CosmicConnect: React.FC = () => {
                       stroke={isVisible ? '#818CF8' : 'rgba(255, 255, 255, 0.08)'}
                       strokeWidth={isVisible ? 2.5 : 1}
                       strokeDasharray={isVisible ? 'none' : '4 4'}
-                      className="transition-all duration-500"
                     />
                   );
                 })}
 
-                {/* Star Nodes */}
+                {/* Nodes */}
                 {currentConstellation.nodes.map((node) => {
                   const isTouched = connectedNodes.includes(node.id);
                   return (
                     <g key={node.id} className="cursor-pointer" onClick={() => handleNodeClick(node.id)}>
-                      {/* Glow halo */}
                       {isTouched && (
                         <circle
                           cx={node.x}
                           y={node.y}
                           r={14}
-                          fill="rgba(129, 140, 248, 0.25)"
+                          fill="rgba(129, 140, 248, 0.3)"
                           className="animate-pulse"
                         />
                       )}
@@ -348,23 +426,22 @@ export const CosmicConnect: React.FC = () => {
                 })}
               </svg>
 
-              {/* Progress counter pill */}
               <div className="absolute bottom-3 left-3 rounded-md bg-slate-900/90 border border-slate-800 px-2.5 py-1 text-[11px] font-mono text-indigo-300">
-                Nodes Connected: {connectedNodes.length} / {currentConstellation.nodes.length}
+                Nodes Linked: {connectedNodes.length} / {currentConstellation.nodes.length}
               </div>
             </div>
           </div>
 
-          {/* Constellation Meaning & Affirmation Output */}
+          {/* Meaning & Affirmation Output */}
           <div className="space-y-6">
-            <div className="rounded-2xl border border-indigo-900/40 bg-gradient-to-b from-[#0f1426] to-[#090c17] p-6 shadow-xl">
-              <div className="flex items-center gap-3 mb-3">
+            <div className="rounded-2xl border border-indigo-900/40 bg-[#0f1426] p-6 shadow-xl space-y-4">
+              <div className="flex items-center gap-3">
                 <span className="text-3xl">{currentConstellation.symbol}</span>
                 <div>
                   <h3 className="font-display text-lg font-bold text-white">
                     {currentConstellation.title}
                   </h3>
-                  <p className="text-xs text-indigo-400 font-mono">Celestial Anchor</p>
+                  <p className="text-xs text-indigo-400 font-mono">Sacred Form</p>
                 </div>
               </div>
 
@@ -372,10 +449,9 @@ export const CosmicConnect: React.FC = () => {
                 {currentConstellation.meaning}
               </p>
 
-              {/* Revealed Affirmation */}
-              <div className="mt-6 border-t border-slate-800 pt-4">
+              <div className="border-t border-slate-800 pt-4">
                 <span className="text-[11px] font-mono text-slate-400 uppercase">
-                  Sacred Grounding Affirmation
+                  Grounding Truth
                 </span>
                 <div className={`mt-2 rounded-xl p-4 border transition-all ${
                   constellationCompleted 
@@ -388,7 +464,7 @@ export const CosmicConnect: React.FC = () => {
                   {constellationCompleted && (
                     <div className="mt-3 flex items-center gap-1.5 text-xs text-emerald-400 font-semibold font-mono">
                       <CheckCircle2 className="h-4 w-4" />
-                      <span>Constellation Anchored · Breath Released</span>
+                      <span>Constellation Anchored · Peace Unlocked</span>
                     </div>
                   )}
                 </div>
@@ -400,42 +476,32 @@ export const CosmicConnect: React.FC = () => {
 
       {/* --- Tab 2: Star Breathe --- */}
       {activeTab === 'breathe' && (
-        <div className="mt-8 mx-auto max-w-3xl rounded-2xl border border-indigo-900/40 bg-gradient-to-b from-[#0b0f1e] to-[#070912] p-8 text-center shadow-2xl">
-          {/* Pattern Selector */}
-          <div className="flex justify-center gap-2 mb-8">
-            <button
-              onClick={() => {
-                setBreathePattern('478');
-                setBreathPhase('Inhale');
-                setBreathTimer(4);
-              }}
-              className={`px-4 py-2 text-xs font-bold rounded-lg border transition-all ${
-                breathePattern === '478'
-                  ? 'border-indigo-500 bg-indigo-600 text-white'
-                  : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
-              }`}
-            >
-              4-7-8 Relaxing Breath (Nervous Reset)
-            </button>
-            <button
-              onClick={() => {
-                setBreathePattern('box');
-                setBreathPhase('Inhale');
-                setBreathTimer(4);
-              }}
-              className={`px-4 py-2 text-xs font-bold rounded-lg border transition-all ${
-                breathePattern === 'box'
-                  ? 'border-indigo-500 bg-indigo-600 text-white'
-                  : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
-              }`}
-            >
-              Box Breathing 4-4-4-4 (High Focus)
-            </button>
+        <div className="mt-8 mx-auto max-w-3xl rounded-2xl border border-indigo-900/40 bg-[#0b0f1e] p-8 text-center shadow-2xl space-y-6">
+          <div className="flex flex-wrap justify-center gap-2">
+            {[
+              { id: '478', label: '4-7-8 Relaxing Breath' },
+              { id: 'box', label: 'Box Breathing 4-4-4-4' },
+              { id: '48', label: '4-8 Vagal Release' }
+            ].map((p) => (
+              <button
+                key={p.id}
+                onClick={() => {
+                  setBreathePattern(p.id as any);
+                  setBreathPhase('Inhale');
+                  setBreathTimer(4);
+                }}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${
+                  breathePattern === p.id
+                    ? 'border-indigo-500 bg-indigo-600 text-white'
+                    : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
           </div>
 
-          {/* Animated Celestial Breathing Sphere */}
           <div className="relative mx-auto my-10 flex h-64 w-64 items-center justify-center">
-            {/* Outer rhythmic pulsing glow */}
             <div
               className={`absolute inset-0 rounded-full transition-all duration-1000 ${
                 breathPhase === 'Inhale'
@@ -445,8 +511,6 @@ export const CosmicConnect: React.FC = () => {
                   : 'scale-75 bg-sky-500/10 blur-md'
               }`}
             />
-
-            {/* Core expanding sphere */}
             <div
               className={`relative flex h-48 w-48 items-center justify-center rounded-full border border-indigo-400/30 transition-all duration-1000 ${
                 breathPhase === 'Inhale'
@@ -467,36 +531,28 @@ export const CosmicConnect: React.FC = () => {
             </div>
           </div>
 
-          {/* Prompt description */}
-          <p className="text-xs text-slate-300 max-w-md mx-auto">
-            {breathPhase === 'Inhale' && 'Slowly breathe in deeply through your nose, expanding your belly.'}
-            {breathPhase === 'Hold' && 'Hold gently without straining. Allow the oxygen to nourish every cell.'}
-            {breathPhase === 'Exhale' && 'Release slowly with a gentle whoosh through your parted lips.'}
-            {breathPhase === 'Pause' && 'Rest quietly in empty stillness before the next wave.'}
-          </p>
-
-          <div className="mt-8 flex items-center justify-center gap-6 border-t border-slate-800 pt-6 text-xs font-mono text-slate-400">
+          <div className="flex items-center justify-center gap-6 border-t border-slate-800 pt-4 text-xs font-mono text-slate-400">
             <div>Completed Waves: <span className="text-white font-bold">{completedCycles}</span></div>
-            <div>Auditory Chimes: <span className="text-emerald-400 font-bold">Active</span></div>
+            <div>Acoustic Entrainment: <span className="text-emerald-400 font-bold">Online</span></div>
           </div>
         </div>
       )}
 
-      {/* --- Tab 3: Cosmic Memory Match --- */}
+      {/* --- Tab 3: 16-Tile Cosmic Memory --- */}
       {activeTab === 'memory' && (
         <div className="mt-8 mx-auto max-w-4xl rounded-2xl border border-indigo-900/40 bg-[#090c17] p-8 shadow-2xl">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-6">
             <div>
               <h3 className="font-display text-lg font-bold text-white">
-                Mindful Memory Alignment
+                Mindful Sensory Focus (16 Tiles)
               </h3>
               <p className="text-xs text-slate-400">
-                Gentle card matching to pull mental fog into clear sensory focus. Zero timers, zero pressure.
+                Align the 8 cosmic resilience symbols. Zero timer pressure, clean tactile chimes.
               </p>
             </div>
             <div className="flex items-center gap-4 text-xs font-mono text-slate-300">
               <span>Moves: {moves}</span>
-              <span>Matched: {matchesCount} / 6</span>
+              <span>Matched: {matchesCount} / 8</span>
               <button
                 onClick={handleResetMemory}
                 className="flex items-center gap-1 rounded bg-slate-800 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-700"
@@ -507,8 +563,7 @@ export const CosmicConnect: React.FC = () => {
             </div>
           </div>
 
-          {/* Cards Grid */}
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+          <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-2.5">
             {memoryCards.map((card, idx) => {
               const isRevealed = card.isFlipped || card.isMatched;
               return (
@@ -520,15 +575,15 @@ export const CosmicConnect: React.FC = () => {
                       ? 'border-emerald-500/50 bg-emerald-950/20 text-white opacity-80'
                       : isRevealed
                       ? 'border-indigo-500 bg-indigo-950/60 text-white'
-                      : 'border-slate-800 bg-slate-900/70 text-slate-500 hover:border-slate-700 hover:bg-slate-900'
+                      : 'border-slate-800 bg-slate-900/70 text-slate-500 hover:border-slate-700'
                   }`}
                 >
                   {isRevealed ? (
-                    <div className="space-y-1">
+                    <div className="space-y-0.5">
                       <span className="text-2xl" style={{ color: card.color }}>
                         {card.icon}
                       </span>
-                      <span className="text-[10px] font-mono text-slate-300 line-clamp-1">
+                      <span className="text-[9px] font-mono text-slate-300 line-clamp-1">
                         {card.name}
                       </span>
                     </div>
@@ -540,20 +595,82 @@ export const CosmicConnect: React.FC = () => {
             })}
           </div>
 
-          {matchesCount === 6 && (
+          {matchesCount === 8 && (
             <div className="mt-8 rounded-xl border border-emerald-500/40 bg-emerald-950/30 p-4 text-center">
               <span className="font-display text-base font-bold text-white">
-                All Celestial Pairs Aligned!
+                All 8 Sacred Pairs Aligned!
               </span>
               <p className="text-xs text-slate-300 mt-1">
-                Notice how your focus narrowed and settled into the task. Take this stillness with you.
+                Your focus has anchored. Stillness is always accessible.
               </p>
             </div>
           )}
         </div>
       )}
 
-      {/* --- Tab 4: 5-4-3-2-1 Grounding Technique --- */}
+      {/* --- Tab 4: The Void Jar (Thought Dissolver) --- */}
+      {activeTab === 'dissolver' && (
+        <div className="mt-8 mx-auto max-w-2xl rounded-2xl border border-indigo-900/40 bg-[#090c17] p-8 shadow-2xl relative overflow-hidden">
+          <div className="text-center space-y-2 mb-6">
+            <h3 className="font-display text-xl font-bold text-white flex items-center justify-center gap-2">
+              <Zap className="h-5 w-5 text-amber-400" />
+              The Void Jar · Thought Dissolver
+            </h3>
+            <p className="text-xs text-slate-300 max-w-md mx-auto">
+              Type the intrusive thought, catastrophe, or grief spinning in your head. 
+              Press dissolve to turn it into celestial stardust and let it go.
+            </p>
+          </div>
+
+          <form onSubmit={handleDissolveThought} className="space-y-4">
+            <div className="relative">
+              <textarea
+                rows={3}
+                placeholder="What heavy thought is weighing on your mind right now?..."
+                value={voidThought}
+                onChange={(e) => setVoidThought(e.target.value)}
+                disabled={isDissolving}
+                className="w-full rounded-xl border border-slate-800 bg-slate-900/90 p-4 text-xs text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none transition-all"
+              />
+
+              {/* Floating stardust animation particles */}
+              {isDissolving && (
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                  {dissolvedParticles.map((p) => (
+                    <div
+                      key={p.id}
+                      className="absolute h-2 w-2 rounded-full bg-amber-400 animate-ping"
+                      style={{
+                        transform: `translate(${p.x}px, ${p.y}px)`,
+                        transition: 'transform 1.5s ease-out'
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isDissolving || !voidThought.trim()}
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-amber-500 py-3 text-xs font-bold text-black hover:bg-amber-400 transition-colors shadow-lg shadow-amber-500/20 disabled:opacity-50"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>{isDissolving ? 'Dissolving into the Cosmos...' : 'Dissolve Into Stardust'}</span>
+            </button>
+          </form>
+
+          {affirmationResult && (
+            <div className="mt-6 rounded-xl border border-indigo-500/40 bg-indigo-950/40 p-4 text-center">
+              <p className="text-xs font-serif text-slate-200 italic">
+                "{affirmationResult}"
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* --- Tab 5: 5-4-3-2-1 Grounding Technique --- */}
       {activeTab === 'grounding' && (
         <div className="mt-8 mx-auto max-w-3xl rounded-2xl border border-indigo-900/40 bg-[#090c17] p-8 shadow-2xl space-y-6">
           <div className="border-b border-slate-800 pb-4">
@@ -607,3 +724,4 @@ export const CosmicConnect: React.FC = () => {
     </div>
   );
 };
+

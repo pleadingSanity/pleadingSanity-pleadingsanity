@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, 
   ShoppingBag, 
@@ -7,9 +7,16 @@ import {
   X, 
   Radio, 
   Compass, 
-  HeartHandshake,
-  ShieldAlert
+  HeartHandshake, 
+  ShieldAlert, 
+  User, 
+  LogOut, 
+  Tv, 
+  FolderSync,
+  Bot
 } from 'lucide-react';
+import { auth } from '../firebase';
+import { signOut, User as FirebaseUser } from 'firebase/auth';
 
 interface NavbarProps {
   activeTab: string;
@@ -17,6 +24,7 @@ interface NavbarProps {
   cartCount: number;
   openCart: () => void;
   onOpenCrisisModal: () => void;
+  onOpenAuth: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -24,15 +32,27 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveTab,
   cartCount,
   openCart,
-  onOpenCrisisModal
+  onOpenCrisisModal,
+  onOpenAuth
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged((user) => {
+      setCurrentUser(user);
+    });
+    return () => unsub();
+  }, []);
 
   const navItems = [
     { id: 'hub', label: 'Manifesto', icon: Sparkles },
     { id: 'healing', label: 'Healing Hz', icon: Radio },
+    { id: 'arron', label: 'Arron AI & GPT', icon: Bot },
     { id: 'shop', label: 'Streetwear', icon: ShoppingBag },
+    { id: 'creators', label: 'Live Hub', icon: Tv },
     { id: 'connect', label: 'Cosmic Connect', icon: Compass },
+    { id: 'workspace', label: 'Workspace', icon: FolderSync },
     { id: 'resilience', label: 'Resilience Wall', icon: HeartHandshake },
     { id: 'crisis', label: 'Sanity Hub', icon: ShieldAlert }
   ];
@@ -87,6 +107,37 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right Action Icons */}
         <div className="flex items-center gap-2">
+          {/* User Sign In / Profile */}
+          {currentUser ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveTab('creators')}
+                className="flex items-center gap-1.5 rounded-md border border-slate-700 bg-slate-900/80 px-2.5 py-1.5 text-xs text-slate-200 hover:border-indigo-500/40"
+                title={currentUser.email || 'My Sanctuary Profile'}
+              >
+                <User className="h-3.5 w-3.5 text-indigo-400" />
+                <span className="hidden sm:inline max-w-[100px] truncate font-mono text-[11px]">
+                  {currentUser.displayName || currentUser.email?.split('@')[0]}
+                </span>
+              </button>
+              <button
+                onClick={() => signOut(auth)}
+                className="rounded-md border border-slate-800 bg-slate-900 p-1.5 text-slate-400 hover:text-rose-400"
+                title="Sign Out"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onOpenAuth}
+              className="flex items-center gap-1.5 rounded-md border border-indigo-500/30 bg-indigo-950/40 px-3 py-1.5 text-xs font-semibold text-indigo-300 hover:bg-indigo-900/40 transition-colors"
+            >
+              <User className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Sign In</span>
+            </button>
+          )}
+
           {/* Urgent Crisis Button */}
           <button
             onClick={onOpenCrisisModal}
@@ -94,7 +145,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="Immediate Free Crisis Support (UK & Global)"
           >
             <PhoneCall className="h-3.5 w-3.5 text-rose-400 animate-pulse" />
-            <span className="hidden sm:inline">Crisis Lifelines (24/7)</span>
+            <span className="hidden sm:inline">Crisis (24/7)</span>
             <span className="sm:hidden">Help</span>
           </button>
 
@@ -151,3 +202,4 @@ export const Navbar: React.FC<NavbarProps> = ({
     </header>
   );
 };
+

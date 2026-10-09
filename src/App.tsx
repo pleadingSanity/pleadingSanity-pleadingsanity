@@ -11,16 +11,24 @@ import { StreetwearShop } from './components/StreetwearShop';
 import { CosmicConnect } from './components/CosmicConnect';
 import { HumanSanityHub } from './components/HumanSanityHub';
 import { ResilienceWall } from './components/ResilienceWall';
+import { CreatorHub } from './components/CreatorHub';
+import { WorkspaceHub } from './components/WorkspaceHub';
+import { ArronAICompanion } from './components/ArronAICompanion';
 import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { CrisisModal } from './components/CrisisModal';
+import { AuthModal } from './components/AuthModal';
+import { InstallPromptModal } from './components/InstallPromptModal';
 import { CartItem, Product } from './types';
+import { Smartphone, Sparkles } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('hub');
   const [selectedHz, setSelectedHz] = useState<number | null>(null);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [isCrisisModalOpen, setIsCrisisModalOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState<boolean>(false);
 
   // Cart State (Persisted in localStorage)
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
@@ -101,6 +109,7 @@ export default function App() {
         cartCount={cartTotalCount}
         openCart={() => setIsCartOpen(true)}
         onOpenCrisisModal={() => setIsCrisisModalOpen(true)}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
       />
 
       {/* Main Sanctuary Content */}
@@ -140,6 +149,11 @@ export default function App() {
               <HealingHz initialHz={528} />
             </div>
 
+            {/* Embedded Creator Hub */}
+            <div className="border-t border-slate-900 bg-[#090d18]">
+              <CreatorHub onOpenAuth={() => setIsAuthModalOpen(true)} />
+            </div>
+
             {/* Embedded Resilience Wall Snapshot */}
             <div className="border-t border-slate-900 bg-[#080b14]">
               <ResilienceWall />
@@ -158,6 +172,18 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'creators' && (
+          <CreatorHub onOpenAuth={() => setIsAuthModalOpen(true)} />
+        )}
+
+        {activeTab === 'arron' && (
+          <ArronAICompanion onTuneFrequency={handleOpenFrequency} />
+        )}
+
+        {activeTab === 'workspace' && (
+          <WorkspaceHub />
+        )}
+
         {activeTab === 'connect' && (
           <CosmicConnect />
         )}
@@ -170,6 +196,17 @@ export default function App() {
           <HumanSanityHub />
         )}
       </main>
+
+      {/* Floating Google Play / PWA Install Launcher */}
+      <div className="fixed bottom-6 left-6 z-40">
+        <button
+          onClick={() => setIsInstallModalOpen(true)}
+          className="flex items-center gap-2 rounded-full border border-indigo-500/40 bg-slate-900/90 py-2.5 px-4 text-xs font-bold text-indigo-200 shadow-xl backdrop-blur-md hover:bg-slate-800 hover:border-indigo-400 transition-all group"
+        >
+          <Smartphone className="h-4 w-4 text-indigo-400 group-hover:scale-110 transition-transform" />
+          <span>Install Sanctuary (Android / Play)</span>
+        </button>
+      </div>
 
       {/* Footer */}
       <Footer
@@ -192,6 +229,19 @@ export default function App() {
         isOpen={isCrisisModalOpen}
         onClose={() => setIsCrisisModalOpen(false)}
       />
+
+      {/* Firebase Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
+
+      {/* Google Play / PWA Install Modal */}
+      <InstallPromptModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+      />
     </div>
   );
 }
+

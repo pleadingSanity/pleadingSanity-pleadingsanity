@@ -1,0 +1,109 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Registered Pleading Sanity community user and sanctuary seeker or creator.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "bio": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastSeen": { "type": "string", "format": "date-time" },
+        "isCreator": { "type": "boolean" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Profile": {
+      "title": "Profile",
+      "description": "User profile with social links, bio, and Founding Creator status.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "bio": { "type": "string" },
+        "socialLinks": {
+          "type": "object",
+          "properties": {
+            "youtube": { "type": "string" },
+            "twitter": { "type": "string" },
+            "instagram": { "type": "string" },
+            "tiktok": { "type": "string" }
+          }
+        },
+        "isFoundingCreator": { "type": "boolean" },
+        "joinedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid"]
+    },
+    "Follow": {
+      "title": "Follow",
+      "description": "Follow relationship connecting members to creators.",
+      "type": "object",
+      "properties": {
+        "followerId": { "type": "string" },
+        "followingId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["followerId", "followingId"]
+    },
+    "Live": {
+      "title": "Live",
+      "description": "Pleading Sanity live stream sessions, scheduled transmissions, and replays.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "creatorId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "scheduledAt": { "type": "string" },
+        "startedAt": { "type": "string" },
+        "endedAt": { "type": "string" },
+        "streamUrl": { "type": "string" },
+        "isPublic": { "type": "boolean" },
+        "replayAvailable": { "type": "boolean" }
+      },
+      "required": ["creatorId", "title"]
+    },
+    "Post": {
+      "title": "Post",
+      "description": "Community posts, reflections, and survival testimonies.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "content": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "visibility": { "type": "string", "enum": ["public", "friends", "private"] },
+        "tag": { "type": "string" },
+        "flames": { "type": "number" }
+      },
+      "required": ["authorId", "content"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User accounts and authentication profiles."
+    },
+    "/profiles/{userId}": {
+      "schema": { "$ref": "#/entities/Profile" },
+      "description": "Detailed public creator/community profile details."
+    },
+    "/follows/{followId}": {
+      "schema": { "$ref": "#/entities/Follow" },
+      "description": "Following records between members and creators."
+    },
+    "/lives/{liveId}": {
+      "schema": { "$ref": "#/entities/Live" },
+      "description": "Live sanity transmissions and broadcasts."
+    },
+    "/posts/{postId}": {
+      "schema": { "$ref": "#/entities/Post" },
+      "description": "Community posts, reflections, and testimonies on the Wall of Resilience."
+    }
+  }
+}
