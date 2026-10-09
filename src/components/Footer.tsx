@@ -86,28 +86,43 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenCrisisModal })
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <button onClick={() => onNavigate('hub')} className="hover:text-white transition-colors">
-                  Manifesto & Ethos
+                <button onClick={() => onNavigate('arcade')} className="hover:text-white transition-colors text-indigo-300 font-semibold">
+                  The 12 Sanctuary Games
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('bible')} className="hover:text-white transition-colors text-amber-300 font-semibold">
+                  The New Gen Bible (12 Tenets)
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('story')} className="hover:text-white transition-colors">
+                  Shane Cooper's Lived Story
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('visuals')} className="hover:text-white transition-colors">
+                  12 Core Visual Themes Gallery
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('arron')} className="hover:text-white transition-colors">
+                  Arron AI & Custom GPT Hub
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('gptfile')} className="hover:text-white transition-colors text-emerald-400">
+                  Master GPT Integration File
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('healing')} className="hover:text-white transition-colors">
-                  Healing Hz Sound Studio (10 Tones)
+                  Healing Hz Sound Bath (10 Tones)
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('shop')} className="hover:text-white transition-colors">
-                  Streetwear Collection (450 GSM Armor)
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('connect')} className="hover:text-white transition-colors">
-                  Cosmic Connect (Star Drawing & Breathe)
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('resilience')} className="hover:text-white transition-colors">
-                  Wall of Resilience (Survival Stories)
+                  Streetwear Vault (450 GSM Armor)
                 </button>
               </li>
               <li>

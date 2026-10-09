@@ -35,6 +35,8 @@ export const InstallPromptModal: React.FC<InstallPromptModalProps> = ({ isOpen, 
     };
   }, []);
 
+  const [fallbackMessage, setFallbackMessage] = useState(false);
+
   const handleInstallClick = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
@@ -44,8 +46,8 @@ export const InstallPromptModal: React.FC<InstallPromptModalProps> = ({ isOpen, 
       }
       setDeferredPrompt(null);
     } else {
-      // Fallback instruction for browsers without direct trigger
-      alert('To install on Android / Chrome: Tap the 3 dots (⋮) in your browser menu, then select "Install app" or "Add to Home screen".');
+      // In-UI instructions without window.alert
+      setFallbackMessage(true);
     }
   };
 
@@ -97,6 +99,12 @@ export const InstallPromptModal: React.FC<InstallPromptModalProps> = ({ isOpen, 
             </div>
           </div>
         </div>
+
+        {fallbackMessage && (
+          <div className="mb-4 rounded-xl border border-indigo-500/40 bg-indigo-950/60 p-3 text-xs text-indigo-200">
+            <strong>Install on Android / Chrome:</strong> Tap the 3 dots (⋮) in your browser menu, then select <em>"Install app"</em> or <em>"Add to Home screen"</em>.
+          </div>
+        )}
 
         <button
           onClick={handleInstallClick}

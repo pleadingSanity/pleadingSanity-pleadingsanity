@@ -14,6 +14,11 @@ import { ResilienceWall } from './components/ResilienceWall';
 import { CreatorHub } from './components/CreatorHub';
 import { WorkspaceHub } from './components/WorkspaceHub';
 import { ArronAICompanion } from './components/ArronAICompanion';
+import { SanctuaryArcade } from './components/SanctuaryArcade';
+import { NewGenBible } from './components/NewGenBible';
+import { ManifestoStory } from './components/ManifestoStory';
+import { VisualSanctuary } from './components/VisualSanctuary';
+import { GPTIntegrationFile } from './components/GPTIntegrationFile';
 import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { CrisisModal } from './components/CrisisModal';
@@ -172,6 +177,26 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'arcade' && (
+          <SanctuaryArcade />
+        )}
+
+        {activeTab === 'bible' && (
+          <NewGenBible />
+        )}
+
+        {activeTab === 'story' && (
+          <ManifestoStory />
+        )}
+
+        {activeTab === 'visuals' && (
+          <VisualSanctuary />
+        )}
+
+        {activeTab === 'gptfile' && (
+          <GPTIntegrationFile />
+        )}
+
         {activeTab === 'creators' && (
           <CreatorHub onOpenAuth={() => setIsAuthModalOpen(true)} />
         )}
@@ -185,7 +210,7 @@ export default function App() {
         )}
 
         {activeTab === 'connect' && (
-          <CosmicConnect />
+          <SanctuaryArcade />
         )}
 
         {activeTab === 'resilience' && (

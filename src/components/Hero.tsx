@@ -9,7 +9,12 @@ import {
   Zap, 
   Anchor, 
   Flame, 
-  Wind 
+  Wind,
+  Gamepad2,
+  BookOpen,
+  Scroll,
+  Palette,
+  Bot
 } from 'lucide-react';
 import { hoodieImg, teeImg, nebulaImg } from '../data/mockData';
 
@@ -165,28 +170,60 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, onOpenFrequency }) => {
           {/* Quick Action Navigation */}
           <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
             <button
-              onClick={() => onNavigate('healing')}
-              className="group flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 hover:bg-indigo-500 transition-all"
+              onClick={() => onNavigate('arcade')}
+              className="group flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-3 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 hover:brightness-110 transition-all"
             >
-              <Radio className="h-4 w-4 text-indigo-200" />
-              <span>Enter Healing Hz Soundscape</span>
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <Gamepad2 className="h-4 w-4 text-indigo-200" />
+              <span>The 12 Sanctuary Games</span>
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+            </button>
+
+            <button
+              onClick={() => onNavigate('bible')}
+              className="flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-950/40 px-5 py-3 text-xs font-bold text-amber-200 hover:bg-amber-900/40 transition-all"
+            >
+              <BookOpen className="h-4 w-4 text-amber-400" />
+              <span>The New Gen Bible</span>
+            </button>
+
+            <button
+              onClick={() => onNavigate('story')}
+              className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/80 px-4 py-3 text-xs font-bold text-slate-200 hover:bg-slate-800 hover:border-slate-700 transition-all"
+            >
+              <Scroll className="h-4 w-4 text-indigo-400" />
+              <span>Shane's Story</span>
+            </button>
+
+            <button
+              onClick={() => onNavigate('visuals')}
+              className="flex items-center gap-2 rounded-xl border border-purple-500/30 bg-purple-950/30 px-4 py-3 text-xs font-bold text-purple-200 hover:bg-purple-900/30 transition-all"
+            >
+              <Palette className="h-4 w-4 text-purple-400" />
+              <span>12 Visuals</span>
+            </button>
+
+            <button
+              onClick={() => onNavigate('arron')}
+              className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-950/30 px-4 py-3 text-xs font-bold text-emerald-200 hover:bg-emerald-900/30 transition-all"
+            >
+              <Bot className="h-4 w-4 text-emerald-400" />
+              <span>Arron AI & GPT</span>
+            </button>
+
+            <button
+              onClick={() => onNavigate('healing')}
+              className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-xs font-bold text-slate-300 hover:bg-slate-900 transition-all"
+            >
+              <Radio className="h-4 w-4 text-cyan-400" />
+              <span>Healing Hz</span>
             </button>
 
             <button
               onClick={() => onNavigate('shop')}
-              className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/80 px-6 py-3.5 text-sm font-semibold text-slate-200 hover:bg-slate-800 hover:border-slate-600 transition-all"
+              className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-xs font-bold text-slate-300 hover:bg-slate-900 transition-all"
             >
               <ShoppingBag className="h-4 w-4 text-slate-400" />
-              <span>The Streetwear Collection</span>
-            </button>
-
-            <button
-              onClick={() => onNavigate('connect')}
-              className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/60 px-5 py-3.5 text-sm font-semibold text-slate-300 hover:bg-slate-900 transition-all"
-            >
-              <Compass className="h-4 w-4 text-cyan-400" />
-              <span>Cosmic Connect</span>
+              <span>Streetwear</span>
             </button>
           </div>
         </div>

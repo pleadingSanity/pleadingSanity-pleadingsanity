@@ -13,7 +13,13 @@ import {
   LogOut, 
   Tv, 
   FolderSync,
-  Bot
+  Bot,
+  Gamepad2,
+  BookOpen,
+  Palette,
+  Scroll,
+  FileCode,
+  Layers
 } from 'lucide-react';
 import { auth } from '../firebase';
 import { signOut, User as FirebaseUser } from 'firebase/auth';
@@ -46,15 +52,18 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, []);
 
   const navItems = [
-    { id: 'hub', label: 'Manifesto', icon: Sparkles },
+    { id: 'hub', label: 'Sanctuary', icon: Sparkles },
+    { id: 'arcade', label: '12 Games', icon: Gamepad2 },
+    { id: 'bible', label: 'New Gen Bible', icon: BookOpen },
+    { id: 'story', label: "Shane's Story", icon: Scroll },
+    { id: 'visuals', label: '12 Visuals', icon: Palette },
+    { id: 'arron', label: 'Arron AI', icon: Bot },
     { id: 'healing', label: 'Healing Hz', icon: Radio },
-    { id: 'arron', label: 'Arron AI & GPT', icon: Bot },
-    { id: 'shop', label: 'Streetwear', icon: ShoppingBag },
     { id: 'creators', label: 'Live Hub', icon: Tv },
-    { id: 'connect', label: 'Cosmic Connect', icon: Compass },
     { id: 'workspace', label: 'Workspace', icon: FolderSync },
-    { id: 'resilience', label: 'Resilience Wall', icon: HeartHandshake },
-    { id: 'crisis', label: 'Sanity Hub', icon: ShieldAlert }
+    { id: 'shop', label: 'Streetwear', icon: ShoppingBag },
+    { id: 'gptfile', label: 'GPT File', icon: FileCode },
+    { id: 'resilience', label: 'Community', icon: HeartHandshake }
   ];
 
   return (
@@ -85,14 +94,14 @@ export const Navbar: React.FC<NavbarProps> = ({
         </button>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-1 overflow-x-auto max-w-3xl py-1 no-scrollbar">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all shrink-0 ${
                   isActive
                     ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
