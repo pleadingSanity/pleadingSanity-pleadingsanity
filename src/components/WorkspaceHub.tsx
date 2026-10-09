@@ -155,13 +155,8 @@ export const WorkspaceHub: React.FC = () => {
       });
       client.requestAccessToken();
     } else {
-      setTimeout(() => {
-        setIsAuthorizing(false);
-        const mockToken = 'mock_workspace_token_' + Date.now();
-        setAccessToken(mockToken);
-        sessionStorage.setItem('ps_workspace_token', mockToken);
-        showStatus('Google Workspace connected for current session.');
-      }, 700);
+      setIsAuthorizing(false);
+      showStatus('Google sign-in is unavailable. Workspace is not connected; configure Google Identity Services and the OAuth client ID first.', 'error');
     }
   };
 
@@ -188,36 +183,17 @@ export const WorkspaceHub: React.FC = () => {
   };
 
   const handleSyncGoogleTasks = () => {
-    setIsSyncingTasks(true);
-    setTimeout(() => {
-      setIsSyncingTasks(false);
-      showStatus('All active wellness routines synced directly to Google Tasks.');
-    }, 1000);
+    showStatus('Google Tasks sync is not connected yet. Your checklist remains available in this app.', 'error');
   };
 
   // Google Drive: Backup Safety Plan
   const handleBackupToDrive = async () => {
-    setIsBackingUpDrive(true);
-    setTimeout(() => {
-      setIsBackingUpDrive(false);
-      const newFile = {
-        id: Date.now().toString(),
-        name: `Pleading_Sanity_Vault_Backup_${new Date().toLocaleDateString('en-GB')}.json`,
-        modified: 'Just now'
-      };
-      setDriveFiles([newFile, ...driveFiles]);
-      showStatus('Safety anchors & audio logs securely backed up to your Google Drive.');
-    }, 1000);
+    showStatus('Google Drive backup is not connected yet. No cloud backup was created.', 'error');
   };
 
   // Google Docs: Export Document
   const handleExportDoc = async () => {
-    setIsExportingDoc(true);
-    setTimeout(() => {
-      setIsExportingDoc(false);
-      setCreatedDocUrl('https://docs.google.com/document');
-      showStatus('New Google Doc created and formatted with Pleading Sanity typography.');
-    }, 1200);
+    showStatus('Google Docs export is not connected yet. No document was created.', 'error');
   };
 
   // Gmail: Send Reassurance Letter
@@ -227,24 +203,14 @@ export const WorkspaceHub: React.FC = () => {
       showStatus('Please specify recipient email address.', 'error');
       return;
     }
-    setIsSendingEmail(true);
-    setTimeout(() => {
-      setIsSendingEmail(false);
-      showStatus(`Safety email transmission sent via Gmail to ${recipientEmail}`);
-      setRecipientEmail('');
-    }, 1000);
+    showStatus('Gmail sending is not connected yet. No email was sent.', 'error');
   };
 
   // Chat: Send Space Message
   const handleSendChat = (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatSpaceText.trim()) return;
-    setIsPostingChat(true);
-    setTimeout(() => {
-      setIsPostingChat(false);
-      showStatus('Check-in broadcast sent to your Google Chat sanctuary space.');
-      setChatSpaceText('');
-    }, 800);
+    showStatus('Google Chat posting is not connected yet. No message was sent.', 'error');
   };
 
   return (
