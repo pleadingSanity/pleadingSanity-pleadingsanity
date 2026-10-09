@@ -704,8 +704,6 @@ export const WorkspaceHub: React.FC = () => {
                       pinned: false,
                       timestamp: 'Just now'
                     };
-                    saveNotes([newNote, ...keepNotes]);
-                    
                     // Save locally first, then report cloud sync honestly.
                     saveNotes([newNote, ...keepNotes]);
                     const user = auth.currentUser;
