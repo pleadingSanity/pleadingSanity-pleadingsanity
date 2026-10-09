@@ -706,8 +706,10 @@ export const WorkspaceHub: React.FC = () => {
                     };
                     saveNotes([newNote, ...keepNotes]);
                     
-                    // Auto-sync to Firebase if logged in
+                    // Save locally first, then report cloud sync honestly.
+                    saveNotes([newNote, ...keepNotes]);
                     const user = auth.currentUser;
+                    let cloudSynced = false;
                     if (user) {
                       try {
                         await saveSanctuaryNoteToFirestore({
@@ -717,15 +719,22 @@ export const WorkspaceHub: React.FC = () => {
                           userId: user.uid,
                           pinned: false
                         });
-                      } catch {
-                        // local fallback preserved
+                        cloudSynced = true;
+                      } catch (error) {
+                        console.error('Sanctuary note cloud sync failed:', error);
                       }
                     }
 
                     // Reset inputs
                     setNewKeepTitle('');
                     setNewKeepContent('');
-                    showStatus('Note saved to Sanctuary!');
+                    if (!user) {
+                      showStatus('Note saved on this device. Sign in to enable cloud sync.', 'error');
+                    } else if (cloudSynced) {
+                      showStatus('Note saved on this device and synced to your account.');
+                    } else {
+                      showStatus('Note saved on this device, but cloud sync failed. It has not synced to your other devices.', 'error');
+                    }
                   }}
                   className="flex items-center gap-1.5 rounded-lg bg-amber-500 px-3.5 py-2 text-xs font-semibold text-black hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
